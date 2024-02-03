@@ -2,13 +2,16 @@ import { useState } from 'react'
 
 
 import './App.css'
+import { Player } from './components'
 
 function App() {
   const [count, setCount] = useState(0)
 
   return (
     <>
-      INDEX
+      <Player/>
+
+      
     </>
   )
 }

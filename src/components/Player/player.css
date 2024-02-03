@@ -1,0 +1,32 @@
+.player-screen{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+    /* gap: 1px; */
+    background-color: rgb(31, 31, 31);
+    /* border-radius: 20px; */
+    margin: auto;
+}
+
+.player-screen-wrapper{
+    width: 100%;
+    height: 100%;
+    overflow: scroll;
+    background-color: grey;
+}
+
+.playerBox{
+    /* background-color: black; */
+    box-sizing: border-box;
+    width: 100vw;
+    height: 100vh;
+    padding: 2em;
+    /* border-radius: 20px; */
+}
+
+.cell {
+    aspect-ratio: 1;
+    /* width: 30px; */
+    border: solid rgb(101, 101, 101) .1px;
+    cursor: pointer;
+    font-size: x-small;
+}

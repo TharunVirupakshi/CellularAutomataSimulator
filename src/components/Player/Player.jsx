@@ -35,13 +35,16 @@ const Player = () => {
   const [gridSize, setGridSize] = useState(2);
   const [gap, setGap] = useState(0);
   const [cellWidth, setCellWidth] = useState(50);
+  const [speed, setSpeed] = useState(1000);
   const states = [0,1];
   const TOT_STATES = states.length;
 
   const screenRef = useRef(null)
 
   const [screenStyle, setScreenStyle] = useState({})
+  // const [playOn, setPlayOn] = useState(false)
 
+  const [intervalId, setIntervalId] = useState(null);
   // const cells = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
 
 
@@ -54,7 +57,7 @@ const Player = () => {
   };
   const [grid, setGrid] = useState(()=>initializeGrid());
   
-  
+  // set screen style
   useEffect(() => {
     
     setScreenStyle({
@@ -159,43 +162,73 @@ const Player = () => {
     const nbors = new Array(states).fill(0);
 
     console.log('Computing next gen......');
-    console.log('nbors[]: ', nbors);
+    // console.log('nbors[]: ', nbors);
 
-    const nextGrid = grid.map((rowArray, row) =>
-    rowArray.map((cell, col) => {
-        nbors.fill(0); //init
-        countNgbhrs(grid, nbors, row, col)
-        console.log('nbrs counted for ',row,' ',col, ' is ', nbors);
-        switch (cell) {
-          case DEAD:
-            if(nbors[ALIVE] == 3) 
-              return ALIVE
-            else
-              return DEAD 
-            break;
+    setGrid((prevGrid) => {
+      console.log('Computing next gen......');
+      console.log('nbors[]: ', nbors);
+  
+      const nextGrid = prevGrid.map((rowArray, row) =>
+        rowArray.map((cell, col) => {
+          nbors.fill(0); //init
+          countNgbhrs(prevGrid, nbors, row, col);
+          console.log('nbrs counted for ', row, ' ', col, ' is ', nbors);
+          switch (cell) {
+            case DEAD:
+              return nbors[ALIVE] === 3 ? ALIVE : DEAD;
+            
+            case ALIVE:
+              return nbors[ALIVE] === 2 || nbors[ALIVE] === 3 ? ALIVE : DEAD;
           
-          case ALIVE:
-            if(nbors[ALIVE] == 2 || nbors[ALIVE] == 3)
-              return ALIVE
-            else
-              return DEAD     
-        
-          default:
-            break;
-        }
-    }
-    )
-
-    );
-
-    console.log('NEXT GEN: ', nextGrid)
-
-    setGrid(nextGrid)
+            default:
+              return cell;
+          }
+        })
+      );
+  
+      console.log('NEXT GEN: ', nextGrid);
+  
+      return nextGrid;
+    });
 
   }
 
-  
-    
+
+  // Function to start the interval
+  const startInterval = () => {
+    const id = setInterval(()=>{
+      console.log('PLAYING.....')
+      computeNextGen(TOT_STATES)
+    }, speed); // Adjust the interval time as needed
+    setIntervalId(id);
+  };
+
+  // Function to stop the interval
+  const stopInterval = () => {
+    console.log('STOPPED......')
+    clearInterval(intervalId);
+    setIntervalId(null);
+  };
+
+  // useEffect to clear the interval when the component unmounts
+  useEffect(() => {
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [intervalId]);
+
+  // Function to handle the "play" button click
+  const handlePlayButtonClick = () => {
+    if (intervalId) {
+      // If the interval is already running, stop it
+      stopInterval();
+    } else {
+      // If the interval is not running, start it
+      startInterval();
+    }
+  };
   
   const handleIntInputOnEnter = (e, callbckFunc) => {
     // e.preventDefault();
@@ -230,6 +263,10 @@ const Player = () => {
         <input type="text" onKeyDown={e => handleIntInputOnEnter(e, setCellWidth)}/>
         
         <button onClick={() => computeNextGen(TOT_STATES)} id='next-gen' style={{marginLeft: '20px'}}>NEXT GEN</button>
+        <label> Interval in ms</label>
+        <input type="text" onKeyDown={e => handleIntInputOnEnter(e, setSpeed)}/>
+        <button onClick={handlePlayButtonClick} id='play' style={{marginLeft: '20px'}}>{intervalId ? 'STOP' : 'PLAY'}</button>
+        
     </div>
   )
 }

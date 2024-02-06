@@ -50,12 +50,12 @@ const Player = () => {
 
 
   // Function to initialize the grid with random alive and dead cells
-  const initializeGrid = () => {
+  const initializeGrid = (gridSize) => {
     return Array.from({ length: gridSize }, () =>
       Array.from({ length: gridSize }, () => 0) 
     );
   };
-  const [grid, setGrid] = useState(()=>initializeGrid());
+  const [grid, setGrid] = useState(()=>initializeGrid(gridSize));
   
   // set screen style
   useEffect(() => {
@@ -71,9 +71,31 @@ const Player = () => {
     console.log('State', grid)
   }, [grid])
 
-  useEffect(() => {
-    setGrid(initializeGrid())
-  },[gridSize])
+  // useEffect(() => {
+  //   setGrid(initializeGrid(gridSize))
+  // },[gridSize])
+
+  const handleGridSizeChange = (newSize) => {
+    // const offset = newSize > gridSize ? (newSize - gridSize - 1) : newSize < gridSize ? -(gridSize - newSize - 1): gridSize;
+    const newOddSize = newSize % 2 === 1 ? newSize : (parseInt(newSize) + 1)
+    const offset = Math.floor((newOddSize - gridSize) / 2);
+
+    console.log('Calculated offset: ', offset, ' for size ', newOddSize)
+
+    const newGrid = initializeGrid(newOddSize)
+    grid?.map((row, rowIndex) =>
+    row.map((cell, colIndex) => {
+        const r = Math.max(rowIndex + offset, 0)
+        const c = Math.max(colIndex + offset, 0)
+        if (newGrid[r] && newGrid[r][c] !== undefined) {
+          newGrid[r][c] = cell;
+        }
+    }))
+
+    setGrid(newGrid)
+    setGridSize(newOddSize)
+
+  }
 
 
 
@@ -123,7 +145,8 @@ const Player = () => {
     
   };
 
-  const gridItems = grid?.map((row, rowIndex) =>
+  const render = () => {
+    return grid?.map((row, rowIndex) =>
     row.map((cell, colIndex) => (
       <div
         key={`${rowIndex}-${colIndex}`}
@@ -131,10 +154,30 @@ const Player = () => {
         style={{ width: `${cellWidth}px` }}
         onClick={(e) => toggleCell(rowIndex, colIndex, e)}
       >
-        {/* {`${rowIndex}-${colIndex}`} */}
+        {`${rowIndex}-${colIndex}`}
       </div>
 
     )))
+  }
+
+  const gridItems = grid?.map((row, rowIndex) =>
+  row.map((cell, colIndex) => (
+    <div
+      key={`${rowIndex}-${colIndex}`}
+      className={`cell ${cell ? 'alive' : 'dead'}`}
+      style={{ width: `${cellWidth}px` }}
+      onClick={(e) => toggleCell(rowIndex, colIndex, e)}
+    >
+      {/* {`${rowIndex}-${colIndex}`} */}
+    </div>
+
+  )))
+
+  // const [gridItems, setGridItems] = useState(()=>render())
+
+  // useEffect(()=>{
+  //   setGridItems(() => render())
+  // },[grid])
   
   //Calculate Neighbors LOGIC
 
@@ -258,9 +301,20 @@ const Player = () => {
           </div>
         </div>
         <label>No. of cells per row </label>
-        <input type="text" onKeyDown={e => handleIntInputOnEnter(e, setGridSize)}/>
-        <label> Cell width</label>
-        <input type="text" onKeyDown={e => handleIntInputOnEnter(e, setCellWidth)}/>
+        <input 
+          type="text" 
+          onKeyDown={e => handleIntInputOnEnter(e, handleGridSizeChange)}
+          style={{marginRight: '20px'}}
+          />
+        <button onClick={()=>handleGridSizeChange(parseInt(gridSize) - 2)} style={{marginRight: '10px'}}>-</button>
+        <button onClick={()=>handleGridSizeChange(parseInt(gridSize) + 2)} style={{marginRight: '5px'}}>+</button>
+        
+        
+        <label> Cell width </label>
+        <input type="text" onKeyDown={e => handleIntInputOnEnter(e, setCellWidth)} style={{marginRight: '20px'}}/>
+
+        <button onClick={()=>setCellWidth(prev => parseInt(prev) - 5)} style={{marginRight: '10px'}}>-</button>
+        <button onClick={()=>setCellWidth(prev => parseInt(prev) + 5)} style={{marginRight: '5px'}}>+</button>
         
         <button onClick={() => computeNextGen(TOT_STATES)} id='next-gen' style={{marginLeft: '20px'}}>NEXT GEN</button>
         <label> Interval in ms</label>

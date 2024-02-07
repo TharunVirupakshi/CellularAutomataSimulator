@@ -1,5 +1,7 @@
-import {useRef, useEffect, useState} from 'react'
+import {useRef, useEffect, useState, useCallback} from 'react'
 import './player.css'
+import worker_script from "./computeWorker.js";
+
 
 // Cell component
 const Cell = ({content, width, classes, onClickFunction}) => {
@@ -35,17 +37,20 @@ const Player = () => {
   const [gridSize, setGridSize] = useState(2);
   const [gap, setGap] = useState(0);
   const [cellWidth, setCellWidth] = useState(50);
-  const [speed, setSpeed] = useState(1000);
+  const [speed, setSpeed] = useState(500);
   const states = [0,1];
   const TOT_STATES = states.length;
+  const NGHBRHOOD_SIZE = 8;
 
   const screenRef = useRef(null)
 
   const [screenStyle, setScreenStyle] = useState({})
   // const [playOn, setPlayOn] = useState(false)
 
-  const [intervalId, setIntervalId] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
   // const cells = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
+
+  const [worker, setWorker] = useState(null)
 
 
 
@@ -97,12 +102,37 @@ const Player = () => {
 
   }
 
+  // Worker Thread
+
+  const handleWorkerMessage = useCallback((ev) => {
+    console.log("[MAIN] Msg from worker: ", ev.data);
+    const { action, res } = ev.data;
+  
+    if (action === "COMPUTE" || action === "PLAYING") {
+      setGrid((prevGrid) => res);
+    }
+  }, [setGrid]);
 
 
   useEffect(()=>{
-    console.log('Grid height: ',screenRef.current.clientHeight)
-  },)
+    const worker = new Worker(worker_script)
+    worker.onmessage = handleWorkerMessage
+
+    setWorker(worker)
+    
+    return () => {
+      worker.terminate()
+    }
+  },[handleWorkerMessage])
+
+
+
+
   
+
+  // useEffect(()=>{
+  //   console.log('Grid height: ',screenRef.current.clientHeight)
+  // },)
   
 
   const toggleState = (state, states) => {
@@ -111,6 +141,7 @@ const Player = () => {
     
     return states[index]
   }
+
   //When you use the functional form of setGrid, 
   //React may batch multiple state updates together, and this can 
   //result in unexpected behavior when you toggle the cell state. 
@@ -145,20 +176,7 @@ const Player = () => {
     
   };
 
-  const render = () => {
-    return grid?.map((row, rowIndex) =>
-    row.map((cell, colIndex) => (
-      <div
-        key={`${rowIndex}-${colIndex}`}
-        className={`cell ${cell ? 'alive' : 'dead'}`}
-        style={{ width: `${cellWidth}px` }}
-        onClick={(e) => toggleCell(rowIndex, colIndex, e)}
-      >
-        {`${rowIndex}-${colIndex}`}
-      </div>
-
-    )))
-  }
+  
 
   const gridItems = grid?.map((row, rowIndex) =>
   row.map((cell, colIndex) => (
@@ -173,15 +191,9 @@ const Player = () => {
 
   )))
 
-  // const [gridItems, setGridItems] = useState(()=>render())
-
-  // useEffect(()=>{
-  //   setGridItems(() => render())
-  // },[grid])
-  
   //Calculate Neighbors LOGIC
 
-  const countNgbhrs = (grid,nbors, r0, c0) => {
+  const countNgbhrs = (grid,gridSize,nbors, r0, c0, n) => {
     // nbors.fill(0)
     for(let r1=-1; r1<=1; ++r1){
       for(let c1=-1; c1<= 1; ++c1){
@@ -196,36 +208,51 @@ const Player = () => {
         }
       }
     }
+    // To account for dead cells outside the grid border
+    let sum = nbors.reduce((accumulator, cuurentVal) => accumulator + cuurentVal, 0);
+    while(sum<n){
+      nbors[0]++
+      sum = nbors.reduce((accumulator, cuurentVal) => accumulator + cuurentVal, 0); 
+    }
   }
 
+  const GOL = [
+    {
+      "53": 1,
+      "default": 0
+    },
+    {
+      "62": 1,
+      "53": 1, 
+      "default": 0
+    },
+  ]
+
+ 
+
   //Compute Next Boards LOGIC
-  const computeNextGen = (states) => {
-    const DEAD = 0;
-    const ALIVE = 1;
+  const computeNextGen = (states, callBck, rules, ngbrhood_size, gridSize) => {
+    // const DEAD = 0;
+    // const ALIVE = 1;
     const nbors = new Array(states).fill(0);
 
-    console.log('Computing next gen......');
-    // console.log('nbors[]: ', nbors);
-
-    setGrid((prevGrid) => {
+    callBck((prevGrid) => {
       console.log('Computing next gen......');
-      console.log('nbors[]: ', nbors);
+      // console.log('nbors[]: ', nbors);
   
       const nextGrid = prevGrid.map((rowArray, row) =>
         rowArray.map((cell, col) => {
           nbors.fill(0); //init
-          countNgbhrs(prevGrid, nbors, row, col);
+          countNgbhrs(prevGrid, gridSize,nbors, row, col, ngbrhood_size);
           console.log('nbrs counted for ', row, ' ', col, ' is ', nbors);
-          switch (cell) {
-            case DEAD:
-              return nbors[ALIVE] === 3 ? ALIVE : DEAD;
-            
-            case ALIVE:
-              return nbors[ALIVE] === 2 || nbors[ALIVE] === 3 ? ALIVE : DEAD;
+          const trans = rules[cell]
+          let newCell = trans[nbors.join("")];
+
+          if(newCell === undefined)
+            newCell = trans["default"]
+           
+          return newCell
           
-            default:
-              return cell;
-          }
         })
       );
   
@@ -236,43 +263,55 @@ const Player = () => {
 
   }
 
-
-  // Function to start the interval
-  const startInterval = () => {
-    const id = setInterval(()=>{
-      console.log('PLAYING.....')
-      computeNextGen(TOT_STATES)
-    }, speed); // Adjust the interval time as needed
-    setIntervalId(id);
-  };
-
-  // Function to stop the interval
-  const stopInterval = () => {
-    console.log('STOPPED......')
-    clearInterval(intervalId);
-    setIntervalId(null);
-  };
-
-  // useEffect to clear the interval when the component unmounts
-  useEffect(() => {
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
+  //Compute next gen on worker Thread
+  const handleComputeNextGen = async() => {
+    const msg = {
+      action: "COMPUTE_NEXT_GEN",
+      payload: {
+        states,
+        grid,
+        gridSize,
+        ngbrhood_size : NGHBRHOOD_SIZE,
+        rules : GOL
       }
-    };
-  }, [intervalId]);
+    }
+    worker.postMessage(msg)
+  };
+
+  
+
+  
 
   // Function to handle the "play" button click
   const handlePlayButtonClick = () => {
-    if (intervalId) {
-      // If the interval is already running, stop it
-      stopInterval();
+    if (isPlaying) {
+      // If currently playing, stop the interval
+      if (worker) {
+        worker.postMessage({ action: 'STOP' });
+      }
     } else {
-      // If the interval is not running, start it
-      startInterval();
+      const msg = {
+        action: "START",
+        payload: {
+          states,
+          grid,
+          gridSize,
+          ngbrhood_size : NGHBRHOOD_SIZE,
+          rules : GOL,
+          delay: speed
+        }
+      }
+      // If currently stopped, start the interval
+      if (worker) {
+        worker.postMessage(msg); // Adjust the interval time as needed
+      }
     }
-  };
-  
+
+    // Toggle the state
+    setIsPlaying(!isPlaying);
+  }
+
+
   const handleIntInputOnEnter = (e, callbckFunc) => {
     // e.preventDefault();
     if (e.key === 'Enter') {
@@ -316,10 +355,10 @@ const Player = () => {
         <button onClick={()=>setCellWidth(prev => parseInt(prev) - 5)} style={{marginRight: '10px'}}>-</button>
         <button onClick={()=>setCellWidth(prev => parseInt(prev) + 5)} style={{marginRight: '5px'}}>+</button>
         
-        <button onClick={() => computeNextGen(TOT_STATES)} id='next-gen' style={{marginLeft: '20px'}}>NEXT GEN</button>
+        <button onClick={handleComputeNextGen} id='next-gen' style={{marginLeft: '20px'}}>NEXT GEN</button>
         <label> Interval in ms</label>
         <input type="text" onKeyDown={e => handleIntInputOnEnter(e, setSpeed)}/>
-        <button onClick={handlePlayButtonClick} id='play' style={{marginLeft: '20px'}}>{intervalId ? 'STOP' : 'PLAY'}</button>
+        <button onClick={handlePlayButtonClick} id='play' style={{marginLeft: '20px'}}>{isPlaying ? 'STOP' : 'PLAY'}</button>
         
     </div>
   )

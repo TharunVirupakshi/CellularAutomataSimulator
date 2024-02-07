@@ -52,6 +52,10 @@ const Player = () => {
 
   const [worker, setWorker] = useState(null)
 
+  const [isDrawing, setIsDrawing] = useState(false);
+
+  
+
 
 
   // Function to initialize the grid with random alive and dead cells
@@ -73,7 +77,7 @@ const Player = () => {
   }, [gridSize,cellWidth])
   
   useEffect(() => {
-    console.log('State', grid)
+    // console.log('State', grid)
   }, [grid])
 
   // useEffect(() => {
@@ -85,7 +89,7 @@ const Player = () => {
     const newOddSize = newSize % 2 === 1 ? newSize : (parseInt(newSize) + 1)
     const offset = Math.floor((newOddSize - gridSize) / 2);
 
-    console.log('Calculated offset: ', offset, ' for size ', newOddSize)
+    // console.log('Calculated offset: ', offset, ' for size ', newOddSize)
 
     const newGrid = initializeGrid(newOddSize)
     grid?.map((row, rowIndex) =>
@@ -176,6 +180,16 @@ const Player = () => {
     
   };
 
+  const handleMouseOver = useCallback(
+    (row, col) => {
+      if (isDrawing) {
+        const newGrid = [...grid];
+        newGrid[row][col] = toggleState(newGrid[row][col], states);
+        setGrid(newGrid);
+      }
+    },
+    [grid, isDrawing]
+  );
   
 
   const gridItems = grid?.map((row, rowIndex) =>
@@ -185,6 +199,7 @@ const Player = () => {
       className={`cell ${cell ? 'alive' : 'dead'}`}
       style={{ width: `${cellWidth}px` }}
       onClick={(e) => toggleCell(rowIndex, colIndex, e)}
+      onMouseOver={() => handleMouseOver(rowIndex, colIndex)}
     >
       {/* {`${rowIndex}-${colIndex}`} */}
     </div>
@@ -329,10 +344,25 @@ const Player = () => {
   };
 
 
+  const handleMouseDown = () => {
+    setIsDrawing(true);
+  };
+
+  const handleMouseUp = () => {
+    setIsDrawing(false);
+  };
+
   return (
     <div className='playerBox'>
         <div className="player-screen-wrapper">
-          <div className="player-screen" ref={screenRef} style={screenStyle} id='playerScreen'>
+          <div 
+            className="player-screen" 
+            ref={screenRef} 
+            style={screenStyle} 
+            id='playerScreen'
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
+          >
               {
                 gridItems?.flat()
               }

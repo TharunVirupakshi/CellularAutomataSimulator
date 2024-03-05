@@ -1,7 +1,7 @@
 import {useRef, useEffect, useState, useCallback} from 'react'
 import './player.css'
 import worker_script from "./computeWorker.js";
-
+import { glider } from './gliderState';
 
 // Cell component
 const Cell = ({content, width, classes, onClickFunction}) => {
@@ -33,8 +33,10 @@ const Cell = ({content, width, classes, onClickFunction}) => {
 
 const Player = () => {
 
+  
+
   // Settings
-  const [gridSize, setGridSize] = useState(2);
+  const [gridSize, setGridSize] = useState(2);    //51 for Glider
   const [gap, setGap] = useState(0);
   const [cellWidth, setCellWidth] = useState(50);
   const [speed, setSpeed] = useState(500);
@@ -64,7 +66,14 @@ const Player = () => {
       Array.from({ length: gridSize }, () => 0) 
     );
   };
+
+  const initializeGridState = (state) => {
+    return Array.from(state)
+  }
+
+
   const [grid, setGrid] = useState(()=>initializeGrid(gridSize));
+  // const [grid, setGrid] = useState(()=>initializeGridState(glider)); //enable for glider
   
   // set screen style
   useEffect(() => {
@@ -74,6 +83,11 @@ const Player = () => {
       gridTemplateColumns: `repeat(auto-fill, minmax(${cellWidth}px, 1fr))`
       // height: '800px'
     })
+    // setScreenStyle({
+    //   width: `${50*cellWidth + gap*cellWidth}px`,
+    //   gridTemplateColumns: `repeat(auto-fill, minmax(${cellWidth}px, 1fr))`
+    //   // height: '800px'
+    // })
   }, [gridSize,cellWidth])
   
   useEffect(() => {
@@ -100,11 +114,14 @@ const Player = () => {
           newGrid[r][c] = cell;
         }
     }))
-
+    console.log('gridddddddd', grid)
     setGrid(newGrid)
     setGridSize(newOddSize)
 
   }
+
+
+  
 
   // Worker Thread
 
@@ -233,12 +250,16 @@ const Player = () => {
 
   const GOL = [
     {
-      "53": 1,
+      "53": 1,  //GOL
+      // "71": 1,
+      // "34": 1,
+      // "44": 1,
       "default": 0
     },
     {
       "62": 1,
-      "53": 1, 
+      "53": 1, //GOL
+      // "44": 1, 
       "default": 0
     },
   ]
@@ -352,6 +373,10 @@ const Player = () => {
     setIsDrawing(false);
   };
 
+  const handleReset = () => {
+    setGrid(initializeGrid(gridSize))
+  }
+
   return (
     <div className='playerBox'>
         <div className="player-screen-wrapper">
@@ -389,6 +414,7 @@ const Player = () => {
         <label> Interval in ms</label>
         <input type="text" onKeyDown={e => handleIntInputOnEnter(e, setSpeed)}/>
         <button onClick={handlePlayButtonClick} id='play' style={{marginLeft: '20px'}}>{isPlaying ? 'STOP' : 'PLAY'}</button>
+        <button onClick={handleReset} id='play' style={{marginLeft: '20px'}}>RESET</button>
         
     </div>
   )

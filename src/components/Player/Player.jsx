@@ -411,11 +411,7 @@ const Player = () => {
      
           <textarea type="text" placeholder='Load a pattern' onChange={e => setRleText(e.target.value)}></textarea>
           <button onClick={handleParsing}>Load</button>
-          <div className="dimensions-container">
-          {/* <label htmlFor="dimX">Dimensions</label> */}
-          <input type="number" name='dimX' placeholder='width of the pattern' onChange={e => setPatternDim(prevDim => ({...prevDim ,x: e.target.value}))}/>
-          <input type="number" name='dimY' placeholder='height of the pattern' onChange={e => setPatternDim(prevDim => ({...prevDim ,y: e.target.value}))}/>
-          </div>
+      
           
         </div>
         <div className="player-screen-wrapper">

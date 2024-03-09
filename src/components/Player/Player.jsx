@@ -2,6 +2,7 @@ import {useRef, useEffect, useState, useCallback} from 'react'
 import './player.css'
 import worker_script from "./computeWorker.js";
 import { glider } from './gliderState';
+import RLE from './rle';
 
 // Cell component
 const Cell = ({content, width, classes, onClickFunction}) => {
@@ -31,6 +32,7 @@ const Cell = ({content, width, classes, onClickFunction}) => {
 }
 
 
+
 const Player = () => {
 
   
@@ -55,12 +57,38 @@ const Player = () => {
   const [worker, setWorker] = useState(null)
 
   const [isDrawing, setIsDrawing] = useState(false);
+  const [rleText, setRleText] = useState('')
+  const [patternDim, setPatternDim] = useState({x: 0, y: 0})
+  const [pattern, setPattern] = useState(null)
 
-  
+
+  const handleParsing = () => {
+    const rle = new RLE()
+    const parsedPattern = rle.parse(rleText);
+
+  // Specify the desired size
+  const SIZE = gridSize; // Change this to your desired size
+
+  // Initialize a new pattern of SIZE x SIZE with all values set to 0
+  const newPattern = Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
+
+  // Copy values from the parsed pattern to the new pattern
+  for (let i = 0; i < Math.min(parsedPattern.length, SIZE); i++) {
+    for (let j = 0; j < Math.min(parsedPattern[i].length, SIZE); j++) {
+      newPattern[i][j] = parsedPattern[i][j];
+    }
+  }
+
+  const newGrid = initializeGridState(newPattern)
+  setGrid(newGrid)
+
+  console.log('Parsed Pattern: ', newPattern);
+  }
 
 
 
-  // Function to initialize the grid with random alive and dead cells
+
+  // Function to initialize the grid with dead cells
   const initializeGrid = (gridSize) => {
     return Array.from({ length: gridSize }, () =>
       Array.from({ length: gridSize }, () => 0) 
@@ -298,7 +326,6 @@ const Player = () => {
     });
 
   }
-
   //Compute next gen on worker Thread
   const handleComputeNextGen = async() => {
     const msg = {
@@ -379,6 +406,18 @@ const Player = () => {
 
   return (
     <div className='playerBox'>
+        {/* <h2>Cellular Automata</h2> */}
+         <div className="load-pattern-container">
+     
+          <textarea type="text" placeholder='Load a pattern' onChange={e => setRleText(e.target.value)}></textarea>
+          <button onClick={handleParsing}>Load</button>
+          <div className="dimensions-container">
+          {/* <label htmlFor="dimX">Dimensions</label> */}
+          <input type="number" name='dimX' placeholder='width of the pattern' onChange={e => setPatternDim(prevDim => ({...prevDim ,x: e.target.value}))}/>
+          <input type="number" name='dimY' placeholder='height of the pattern' onChange={e => setPatternDim(prevDim => ({...prevDim ,y: e.target.value}))}/>
+          </div>
+          
+        </div>
         <div className="player-screen-wrapper">
           <div 
             className="player-screen" 
@@ -396,7 +435,7 @@ const Player = () => {
         </div>
         <label>No. of cells per row </label>
         <input 
-          type="text" 
+          type="number" 
           onKeyDown={e => handleIntInputOnEnter(e, handleGridSizeChange)}
           style={{marginRight: '20px'}}
           />
@@ -415,6 +454,8 @@ const Player = () => {
         <input type="text" onKeyDown={e => handleIntInputOnEnter(e, setSpeed)}/>
         <button onClick={handlePlayButtonClick} id='play' style={{marginLeft: '20px'}}>{isPlaying ? 'STOP' : 'PLAY'}</button>
         <button onClick={handleReset} id='play' style={{marginLeft: '20px'}}>RESET</button>
+        
+       
         
     </div>
   )

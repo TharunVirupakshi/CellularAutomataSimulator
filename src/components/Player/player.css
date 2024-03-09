@@ -34,3 +34,11 @@
 .cell.alive{
     background-color: rgb(194, 194, 194);
 }
+
+.load-pattern-container{
+    display: flex;
+    padding: 1em;
+}
+.dimensions-container{
+    margin-left: 1em;
+}

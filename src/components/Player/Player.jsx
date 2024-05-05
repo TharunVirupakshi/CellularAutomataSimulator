@@ -448,60 +448,67 @@ const Player = () => {
     };
   }, []); 
 
+  const calculateMiddlePosition = () => {
+    // Get the width and height of the screen
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+
+    // Calculate middle position for x and y coordinates
+    // const middleX = Math.floor(screenWidth / 2); // Middle of the screen width
+    const middleY = Math.floor(screenHeight / 2); // Middle of the screen height
+
+    return { x: 0, y: middleY - 100 };
+};
+
+  const middlePosition = calculateMiddlePosition()
 
 
 
-
-  return (<>
-    
-    <div className="logo-container">
-          <h1>GridLife. </h1>
-        </div>
+  return (
+  <>
+  
     <div className='playerBox'>
         {/* <h2>Cellular Automata</h2> */}
         
         <div className="controlPanel">
 
-         
+          <div className="basicControlsBox ">
 
+            <div className="cntrlEleWrapper">
 
-        <div className="basicControlsBox ">
+              <div className="cntrlElement">
 
-        <div className="cntrlEleWrapper">
-
-        <div className="cntrlElement">
-     
-          <textarea rows={3} cols={20} type="text" placeholder='Load a pattern' onChange={e => setRleText(e.target.value)}></textarea>
-          <button onClick={handleParsing}>Load</button>
-          </div>
-        </div>
-
-        <div className="cntrlEleWrapper">
-
-          <div className="cntrlElement ">
-            <label>No. of cells per row </label>
-            <div>
-              <input
-                type="number"
-                onKeyDown={e => handleIntInputOnEnter(e, handleGridSizeChange)}
-
-              />
-              <div className='btnsContainer'>
-
-                <button onClick={() => handleGridSizeChange(parseInt(gridSize) - 2)}>-</button>
-                <button onClick={() => handleGridSizeChange(parseInt(gridSize) + 2)}>+</button>
+                <textarea rows={3} cols={20} type="text" placeholder='Load a pattern' onChange={e => setRleText(e.target.value)}></textarea>
+                <button onClick={handleParsing}>Load</button>
               </div>
             </div>
-          </div>
-        </div>
 
-          <div className="cntrlEleWrapper">
+            <div className="cntrlEleWrapper">
 
-          <div className="cntrlElement">
-            <label> Cell width </label>
-            <div>
-              <input type="text" onKeyDown={e => handleIntInputOnEnter(e, setCellWidth)} />
-              <div className='btnsContainer'>
+              <div className="cntrlElement ">
+                <label>Grid size</label>
+                <div>
+                  <input
+                    type="number"
+                    onKeyDown={e => handleIntInputOnEnter(e, handleGridSizeChange)}
+
+                  />
+                  <div className='btnsContainer'>
+
+                    <button onClick={() => handleGridSizeChange(parseInt(gridSize) - 2)}>-</button>
+                    <button onClick={() => handleGridSizeChange(parseInt(gridSize) + 2)}>+</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="cntrlEleWrapper">
+
+              <div className="cntrlElement">
+                <label> Cell width </label>
+                <div>
+                  <input type="text" onKeyDown={e => handleIntInputOnEnter(e, setCellWidth)} />
+                  <div className='btnsContainer'>
 
                 <button onClick={() => setCellWidth(prev => parseInt(prev) - 5)}>-</button>
                 <button onClick={() => setCellWidth(prev => parseInt(prev) + 5)}>+</button>
@@ -514,7 +521,7 @@ const Player = () => {
           <div className="cntrlEleWrapper">
 
           <div className="cntrlElement">
-            <label> Interval in ms</label>
+            <label> Speed in ms</label>
             <div>
               <input type="text" onKeyDown={e => handleIntInputOnEnter(e, setSpeed)} />
               <div className='btnsContainer'>
@@ -539,7 +546,7 @@ const Player = () => {
         
         </div>
         <div className="player-screen-wrapper" >
-        <Draggable disabled={disableDrag} >
+        <Draggable disabled={disableDrag} defaultPosition={middlePosition}   >
           <div 
             className="player-screen" 
             ref={screenRef} 

@@ -2,6 +2,7 @@
 .player-screen{
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+    min-width: 0; /* Ensure items can shrink beyond their content width */
     /* gap: 1px; */
     background-color: rgb(31, 31, 31);
     /* border-radius: 20px; */
@@ -9,9 +10,10 @@
 }
 
 .player-screen-wrapper{
-    display: flex;
-    justify-content: center;
-    align-items: center;
+        /* display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap:; */
     width: 100%;
     height: 100%;
     overflow: scroll;
@@ -50,7 +52,7 @@
     background-color: rgba(0, 0, 0, 0.608);
     position: absolute;
     bottom: 0;
-    z-index: 999;
+    z-index: 10;
     width: 100vw;
 }
 
@@ -102,13 +104,6 @@ button{
 
 .btnsContainer button{
     flex: 1;
-}
-.logo-container{
-    position: absolute  ;
-    font-family:monospace;
-    font-weight: bolder;
-    padding-left: 2em;
-    z-index: 9999;
 }
 
 .simBtns{

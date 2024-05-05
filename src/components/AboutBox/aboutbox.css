@@ -1,0 +1,17 @@
+
+
+/* App.css (or any other CSS file) */
+.content {
+    font-family: 'Courier New', Courier, monospace;
+    color: #ddd; /* Light gray text color */
+  }
+  
+  .content h2 {
+    color: #ffc107; /* Yellow heading color */
+  }
+
+  .highlight {
+    background-color: #ffffcc; /* Yellow background color */
+    padding: 5px;
+    border-radius: 3px;
+}

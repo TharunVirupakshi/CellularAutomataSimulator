@@ -1,3 +1,4 @@
+
 .player-screen{
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
@@ -8,18 +9,22 @@
 }
 
 .player-screen-wrapper{
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 100%;
     height: 100%;
     overflow: scroll;
-    background-color: grey;
+    /* background-color: grey; */
 }
+
 
 .playerBox{
     /* background-color: black; */
     box-sizing: border-box;
     width: 100vw;
     height: 100vh;
-    padding: 2em;
+    /* padding: 2em; */
     /* border-radius: 20px; */
 }
 
@@ -35,10 +40,87 @@
     background-color: rgb(194, 194, 194);
 }
 
-.load-pattern-container{
-    display: flex;
-    padding: 1em;
-}
+
 .dimensions-container{
     margin-left: 1em;
+}
+
+.controlPanel{
+    display: flex;
+    background-color: rgba(0, 0, 0, 0.608);
+    position: absolute;
+    bottom: 0;
+    z-index: 999;
+    width: 100vw;
+}
+
+.basicControlsBox{
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(5, auto);
+  grid-template-rows: auto;
+  /* gap: 10px; */
+  /* align-items: center; */
+  justify-items: stretch;
+  padding: 20px;
+  
+}       
+
+
+.basicControlsBox > .cntrlEleWrapper{
+    border-left: 1px solid rgb(63, 63, 63);
+}
+.basicControlsBox > .cntrlEleWrapper:first-child{
+    border-left: none;
+}
+
+
+
+.cntrlEleWrapper{
+    display: flex;
+    justify-content: center;
+    width: 100% ;
+}
+
+.cntrlElement{
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    flex-direction: column;
+}
+
+button{
+    cursor: pointer;
+}
+
+.btnsContainer{
+    padding: 5px 0;
+    display: flex;
+    justify-content: stretch;
+    gap: 5px; 
+}
+
+.btnsContainer button{
+    flex: 1;
+}
+.logo-container{
+    position: absolute  ;
+    font-family:monospace;
+    font-weight: bolder;
+    padding-left: 2em;
+    z-index: 9999;
+}
+
+.simBtns{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    grid-column: 5 / 5;
+    grid-row: 1 / -1;
+}
+
+textarea{
+    resize: none;
 }

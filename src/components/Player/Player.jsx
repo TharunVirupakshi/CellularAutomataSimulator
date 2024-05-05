@@ -3,7 +3,7 @@ import './player.css'
 import worker_script from "./computeWorker.js";
 import { glider } from './gliderState';
 import RLE from './rle';
-
+import Draggable from 'react-draggable';
 // Cell component
 const Cell = ({content, width, classes, onClickFunction}) => {
 
@@ -212,8 +212,9 @@ const Player = () => {
   //   });
   // };
 
-  const toggleCell = (row, col) => {
+  const toggleCell = (row, col, e) => {
     // console.log('ToggleCell Triggered:', row, col);
+    if(!(e.ctrlKey || e.metaKey)) return;
     const newGrid = grid.map((rowArray, rowIndex) =>
       rowArray.map((cell, colIndex) =>{
         // console.log('CurState: ', cell, ' NewState: ', toggleState(cell, states));
@@ -226,8 +227,8 @@ const Player = () => {
   };
 
   const handleMouseOver = useCallback(
-    (row, col) => {
-      if (isDrawing) {
+    (row, col, e) => {
+      if (isDrawing){
         const newGrid = [...grid];
         newGrid[row][col] = toggleState(newGrid[row][col], states);
         setGrid(newGrid);
@@ -244,7 +245,7 @@ const Player = () => {
       className={`cell ${cell ? 'alive' : 'dead'}`}
       style={{ width: `${cellWidth}px` }}
       onClick={(e) => toggleCell(rowIndex, colIndex, e)}
-      onMouseOver={() => handleMouseOver(rowIndex, colIndex)}
+      onMouseOver={(e) => handleMouseOver(rowIndex, colIndex, e)}
     >
       {/* {`${rowIndex}-${colIndex}`} */}
     </div>
@@ -347,12 +348,17 @@ const Player = () => {
 
   // Function to handle the "play" button click
   const handlePlayButtonClick = () => {
+
+
     if (isPlaying) {
       // If currently playing, stop the interval
+      // If currently playing, stop the worker thread
+      console.log('Stopping Worker Thread');
       if (worker) {
         worker.postMessage({ action: 'STOP' });
       }
     } else {
+      console.log('Starting Worker Thread')
       const msg = {
         action: "START",
         payload: {
@@ -371,7 +377,7 @@ const Player = () => {
     }
 
     // Toggle the state
-    setIsPlaying(!isPlaying);
+    setIsPlaying(prev => !prev);
   }
 
 
@@ -392,7 +398,7 @@ const Player = () => {
   };
 
 
-  const handleMouseDown = () => {
+  const handleMouseDown = (e) => {
     setIsDrawing(true);
   };
 
@@ -404,56 +410,155 @@ const Player = () => {
     setGrid(initializeGrid(gridSize))
   }
 
-  return (
+  const [disableDrag, setDisableDrag] = useState(false)
+  const playButtonRef = useRef(null);
+
+  // Controlling Key Commands
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+
+      // // Check if the focused element is the play button
+      // const focusedElement = document.activeElement;
+      // const isPlayButtonFocused = focusedElement === playButtonRef.current;
+      // //Toggle play/pause
+      // if(e.code === 'Space' && !isPlayButtonFocused){
+      //   e.preventDefault()    
+      //   handlePlayButtonClick()
+      // }  
+
+      if (e.metaKey || e.ctrlKey) {
+        if((e.metaKey || e.ctrlKey) && e.altKey) setIsDrawing(true)
+        setDisableDrag(true); // Disable dragging when CMD/Ctrl key is pressed
+      }
+    };
+
+    const handleKeyUp = (e) => {
+      if (!e.metaKey && !e.ctrlKey) {
+        setIsDrawing(false)
+        setDisableDrag(false); // Re-enable dragging when CMD/Ctrl key is released
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []); 
+
+
+
+
+
+  return (<>
+    
+    <div className="logo-container">
+          <h1>GridLife. </h1>
+        </div>
     <div className='playerBox'>
         {/* <h2>Cellular Automata</h2> */}
-         <div className="load-pattern-container">
+        
+        <div className="controlPanel">
+
+         
+
+
+        <div className="basicControlsBox ">
+
+        <div className="cntrlEleWrapper">
+
+        <div className="cntrlElement">
      
-          <textarea type="text" placeholder='Load a pattern' onChange={e => setRleText(e.target.value)}></textarea>
+          <textarea rows={3} cols={20} type="text" placeholder='Load a pattern' onChange={e => setRleText(e.target.value)}></textarea>
           <button onClick={handleParsing}>Load</button>
-      
-          
+          </div>
         </div>
-        <div className="player-screen-wrapper">
+
+        <div className="cntrlEleWrapper">
+
+          <div className="cntrlElement ">
+            <label>No. of cells per row </label>
+            <div>
+              <input
+                type="number"
+                onKeyDown={e => handleIntInputOnEnter(e, handleGridSizeChange)}
+
+              />
+              <div className='btnsContainer'>
+
+                <button onClick={() => handleGridSizeChange(parseInt(gridSize) - 2)}>-</button>
+                <button onClick={() => handleGridSizeChange(parseInt(gridSize) + 2)}>+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+          <div className="cntrlEleWrapper">
+
+          <div className="cntrlElement">
+            <label> Cell width </label>
+            <div>
+              <input type="text" onKeyDown={e => handleIntInputOnEnter(e, setCellWidth)} />
+              <div className='btnsContainer'>
+
+                <button onClick={() => setCellWidth(prev => parseInt(prev) - 5)}>-</button>
+                <button onClick={() => setCellWidth(prev => parseInt(prev) + 5)}>+</button>
+
+              </div>
+            </div>
+          </div>
+          </div>
+
+          <div className="cntrlEleWrapper">
+
+          <div className="cntrlElement">
+            <label> Interval in ms</label>
+            <div>
+              <input type="text" onKeyDown={e => handleIntInputOnEnter(e, setSpeed)} />
+              <div className='btnsContainer'>
+                <button onClick={() => {}}>-</button>
+                <button onClick={() => {}}>+</button>
+              </div>
+            </div>
+          </div> 
+          </div>
+          <div className="cntrlEleWrapper">
+          <div className="cntrlElement simBtns ">
+
+            <button onClick={handleComputeNextGen} id='next-gen' >NEXT GEN</button>
+            <button ref={playButtonRef} onClick={handlePlayButtonClick} id='play' >{isPlaying ? 'STOP' : 'PLAY'}</button>
+            <button onClick={handleReset} id='play'>RESET</button>
+    
+          </div>
+          </div>
+        </div>
+       
+          
+        
+        </div>
+        <div className="player-screen-wrapper" >
+        <Draggable disabled={disableDrag} >
           <div 
             className="player-screen" 
             ref={screenRef} 
             style={screenStyle} 
             id='playerScreen'
-            onMouseDown={handleMouseDown}
-            onMouseUp={handleMouseUp}
+            // onMouseDown={e => handleMouseDown(e)}
+            // onMouseUp={e => handleMouseUp(e)}
           >
               {
                 gridItems?.flat()
               }
             
           </div>
+          </Draggable>
         </div>
-        <label>No. of cells per row </label>
-        <input 
-          type="number" 
-          onKeyDown={e => handleIntInputOnEnter(e, handleGridSizeChange)}
-          style={{marginRight: '20px'}}
-          />
-        <button onClick={()=>handleGridSizeChange(parseInt(gridSize) - 2)} style={{marginRight: '10px'}}>-</button>
-        <button onClick={()=>handleGridSizeChange(parseInt(gridSize) + 2)} style={{marginRight: '5px'}}>+</button>
         
-        
-        <label> Cell width </label>
-        <input type="text" onKeyDown={e => handleIntInputOnEnter(e, setCellWidth)} style={{marginRight: '20px'}}/>
-
-        <button onClick={()=>setCellWidth(prev => parseInt(prev) - 5)} style={{marginRight: '10px'}}>-</button>
-        <button onClick={()=>setCellWidth(prev => parseInt(prev) + 5)} style={{marginRight: '5px'}}>+</button>
-        
-        <button onClick={handleComputeNextGen} id='next-gen' style={{marginLeft: '20px'}}>NEXT GEN</button>
-        <label> Interval in ms</label>
-        <input type="text" onKeyDown={e => handleIntInputOnEnter(e, setSpeed)}/>
-        <button onClick={handlePlayButtonClick} id='play' style={{marginLeft: '20px'}}>{isPlaying ? 'STOP' : 'PLAY'}</button>
-        <button onClick={handleReset} id='play' style={{marginLeft: '20px'}}>RESET</button>
-        
-       
         
     </div>
+    </>
   )
 }
 

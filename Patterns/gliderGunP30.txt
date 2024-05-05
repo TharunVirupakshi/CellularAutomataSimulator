@@ -1,0 +1,3 @@
+x = 45, y = 20, rule = B3/S23
+5$28bo$26bobo$16b2o6b2o12b2o$15bo3bo4b2o12b2o$4b2o8bo5bo3b2o$4b2o8bo3b
+ob2o4bobo$14bo5bo7bo$15bo3bo$16b2o!

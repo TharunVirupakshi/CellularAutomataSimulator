@@ -1,0 +1,11 @@
+x = 82, y = 74, rule = B3/S23
+4$35b2o$35bobo$37bo4b2o$33b4ob2o2bo2bo$33bo2bo3bobob2o$36bobobobo$37b
+2obobo$41bo2$27b2o$28bo8bo$28bobo5b2o$29b2o$43bo$44bo$42b3o2$33bo$33b
+2o$32bobo4b2o22bo$39bo21b3o$40b3o17bo$42bo17b2o2$53bo$54b2o12b2o$53b2o
+14bo$11b2o56bob2o$12bo9b2o37bo5b3o2bo$10bo10bobo37b2o3bo3b2o$10b5o8bo
+5b2o35b2obo$15bo13bo22b2o15bo$12b3o12bobo21bobo12b3o$11bo15b2o22bo13b
+o$11bob2o35b2o5bo8b5o$9b2o3bo3b2o37bobo10bo$8bo2b3o5bo37b2o9bo$8b2obo
+56b2o$11bo14b2o$11b2o12b2o$27bo2$19b2o17bo$20bo17b3o$17b3o21bo$17bo22b
+2o4bobo$46b2o$47bo2$36b3o$36bo$37bo$50b2o$43b2o5bobo$43bo8bo$52b2o2$39b
+o$38bobob2o$38bobobobo$35b2obobo3bo2bo$35bo2bo2b2ob4o$37b2o4bo$43bobo
+$44b2o!

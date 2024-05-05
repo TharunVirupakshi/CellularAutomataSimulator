@@ -1,0 +1,4 @@
+x = 36, y = 39, rule = B3/S23
+2$16b2o$16b2o3$28b2o$28bo$26bobo$25bobo$16bo4b2o3bo$5b2o10bo3b2o$5b2o
+8b3o11$27b2o$22b2o3bo$22b2o4b3o$30bo$5b2o4b3o$5b2o6bo$12bo5$11b2o$11b
+2o!

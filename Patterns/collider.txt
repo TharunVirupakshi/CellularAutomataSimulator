@@ -1,0 +1,4 @@
+24bo$22bobo$12b2o6b2o12b2o$11bo3bo4b2o12b2o$2o8bo5bo3b2o$2o8bo3bob2o4b
+obo$10bo5bo7bo$11bo3bo$12b2o43$17b2o$17b2o10$15b2o3b2o2$16bo3bo$17b3o
+$17b3o3$20bo$19b3o$18bo3bo$20bo$17bo5bo$17bo5bo$18bo3bo$19b3o9$19b2o$
+19b2o!

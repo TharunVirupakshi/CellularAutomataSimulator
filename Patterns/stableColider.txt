@@ -1,0 +1,7 @@
+x = 76, y = 52, rule = B3/S23
+4$24b2o11bo6b2o$24b2o10bobo4bo2bo$36bobo3bob3o2b2o$35b2ob2obobo6bo$39b
+obo3b2o3bobo$35b2obo2b4obo4b2o$35b2obobo3bo$39bobo3bo$40bobo3bo$41bo3b
+2o14bo$60bobo$61bo2$32b2o$32b2o$17b2o$16bo2bo$15bob2o42b2o$15bo45b2o$
+14b2o$29b2o$29bo$30b3o$32bo5b2o$37bobo$37bo$36b2o3$44bo15b2o$43bobo14b
+obo$43bobo16bo$44bo17b2o$2o6b3o37b2o$2o8bo37bobo$9bo40bo$50b2o5$8b2o33b
+obo$8b2o34b2o$44bo!

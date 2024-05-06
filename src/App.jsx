@@ -13,12 +13,15 @@ function App() {
   const [aboutModal, setAboutModal] = useState(false)
   const [helpModal, setHelpModal] = useState(false)
 
+
   function openAboutModal() {
     setAboutModal(true);
+  
   }
 
   function openHelpModal(){
     setHelpModal(true)
+
   }
 
   const closeAboutModal = () => {

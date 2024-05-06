@@ -1,0 +1,79 @@
+.content {
+    font-family: 'Courier New', Courier, monospace;
+    color: #ddd; /* Light gray text color */
+  }
+  
+.content h2 {
+    color: #ffc107; /* Yellow heading color */  
+}
+
+.highlight {
+    background-color: #ffffcc; /* Yellow background color */
+    padding: 5px;
+    border-radius: 3px;
+}
+
+.infoSection-RImage{
+    display: flex;
+}
+
+.imgContainer{
+    margin: 2em;
+    aspect-ratio: 1/1;
+    /* width: 10em; */
+    height: 15em;
+    object-fit: contain;
+}
+
+.imgContainer img{
+    height: 100%;
+    width: 100%;
+}
+
+.navigationBtns{
+    margin-top: 1em;
+    font-size: large;
+    display: flex;
+    width: 100%;
+    /* background-color: #ffc107; */
+    justify-content: space-between;
+}
+
+.sidenote {
+    background-color: #444444; /* Light blue background color */
+    border-left: 4px solid #ffc107; /* Left border color */
+    padding: 10px;
+    margin-bottom: 15px; /* Bottom margin for separation */
+}
+.sidenote p {
+    margin: 0; /* Remove default paragraph margin */
+}
+
+.sidenote .underline {
+    padding: 2px 5px;
+    border-radius: 5px;
+    background-color: #5f5f5f;
+    font-weight: bold;
+
+}
+
+.ruleDefiner{
+    display: flex;
+    gap: 5px;
+}
+
+.counter{
+    display: flex;
+    flex-direction: column;
+    padding: 2px;
+    justify-content: center;
+}
+
+.counter input{
+    width: 35px;
+}
+
+.counter label{
+    text-align: center;
+}
+

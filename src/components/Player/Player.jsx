@@ -4,6 +4,8 @@ import worker_script from "./computeWorker.js";
 import { glider } from './gliderState';
 import RLE from './rle';
 import Draggable from 'react-draggable';
+import Modal from 'react-modal'
+import CustomRulesWiz from '../CustomRulesWiz/CustomRulesWiz';
 // Cell component
 const Cell = ({content, width, classes, onClickFunction}) => {
 
@@ -109,13 +111,7 @@ const Player = () => {
     setScreenStyle({
       width: `${gridSize*cellWidth + gap*cellWidth}px`,
       gridTemplateColumns: `repeat(auto-fill, minmax(${cellWidth}px, 1fr))`
-      // height: '800px'
     })
-    // setScreenStyle({
-    //   width: `${50*cellWidth + gap*cellWidth}px`,
-    //   gridTemplateColumns: `repeat(auto-fill, minmax(${cellWidth}px, 1fr))`
-    //   // height: '800px'
-    // })
   }, [gridSize,cellWidth])
   
   useEffect(() => {
@@ -175,14 +171,6 @@ const Player = () => {
   },[handleWorkerMessage])
 
 
-
-
-  
-
-  // useEffect(()=>{
-  //   console.log('Grid height: ',screenRef.current.clientHeight)
-  // },)
-  
 
   const toggleState = (state, states) => {
     const index = ((states.indexOf(state)) + 1) % states.length;
@@ -280,15 +268,11 @@ const Player = () => {
   const GOL = [
     {
       "53": 1,  //GOL
-      // "71": 1,
-      // "34": 1,
-      // "44": 1,
       "default": 0
     },
     {
       "62": 1,
       "53": 1, //GOL
-      // "44": 1, 
       "default": 0
     },
   ]
@@ -413,30 +397,21 @@ const Player = () => {
   const [disableDrag, setDisableDrag] = useState(false)
   const playButtonRef = useRef(null);
 
+
+
   // Controlling Key Commands
   useEffect(() => {
     const handleKeyDown = (e) => {
-
-      // // Check if the focused element is the play button
-      // const focusedElement = document.activeElement;
-      // const isPlayButtonFocused = focusedElement === playButtonRef.current;
-      // //Toggle play/pause
-      // if(e.code === 'Space' && !isPlayButtonFocused){
-      //   e.preventDefault()    
-      //   handlePlayButtonClick()
-      // }  
-
-      if (e.metaKey || e.ctrlKey) {
         if((e.metaKey || e.ctrlKey) && e.altKey) setIsDrawing(true)
         setDisableDrag(true); // Disable dragging when CMD/Ctrl key is pressed
-      }
     };
-
+    
     const handleKeyUp = (e) => {
+      if (screenRef.current && screenRef.current.contains(e.target)) {
       if (!e.metaKey && !e.ctrlKey) {
         setIsDrawing(false)
         setDisableDrag(false); // Re-enable dragging when CMD/Ctrl key is released
-      }
+      }}
     };
 
     document.addEventListener('keydown', handleKeyDown);
@@ -463,6 +438,11 @@ const Player = () => {
   const middlePosition = calculateMiddlePosition()
 
 
+  const [ruleModal, setRuleModal] = useState(false)
+
+
+
+
 
   return (
   <>
@@ -477,12 +457,46 @@ const Player = () => {
             <div className="cntrlEleWrapper">
 
               <div className="cntrlElement">
-
+                <label >Load pattern</label>
                 <textarea rows={3} cols={20} type="text" placeholder='Load a pattern' onChange={e => setRleText(e.target.value)}></textarea>
                 <button onClick={handleParsing}>Load</button>
               </div>
             </div>
+          
 
+            <div className="cntrlEleWrapper">
+
+              <div className="cntrlElement">
+                <label >Rules</label>
+                <div>
+                  <select id="ruleset" name="ruleset">
+                    <option value="GOL" defaultChecked>GameOfLife</option>
+                    <option value="2">2</option>  
+                  </select>
+
+            
+                  <p style={{textAlign : "center", margin: 0 }}>OR</p>
+                  <div className='btnsContainer'>
+            
+                    <button onClick={() => setRuleModal(true)}>Custom Rule</button>
+                    <Modal
+                      isOpen={ruleModal}
+                      onRequestClose={() => setRuleModal(false)}
+                      className="modal"
+                      overlayClassName="modal-overlay"
+                    >
+                      <div className="modal-content">
+                        <button className="close-button" onClick={() => setRuleModal(false)}>
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                        <CustomRulesWiz/>
+                      </div>
+                    </Modal>
+
+                  </div>
+                </div>
+              </div>
+            </div>
             <div className="cntrlEleWrapper">
 
               <div className="cntrlElement ">
@@ -491,7 +505,7 @@ const Player = () => {
                   <input
                     type="number"
                     onKeyDown={e => handleIntInputOnEnter(e, handleGridSizeChange)}
-
+                    placeholder="Press enter after typing"
                   />
                   <div className='btnsContainer'>
 
@@ -507,7 +521,7 @@ const Player = () => {
               <div className="cntrlElement">
                 <label> Cell width </label>
                 <div>
-                  <input type="text" onKeyDown={e => handleIntInputOnEnter(e, setCellWidth)} />
+                  <input type="text" onKeyDown={e => handleIntInputOnEnter(e, setCellWidth)} placeholder="Press enter after typing"/>
                   <div className='btnsContainer'>
 
                 <button onClick={() => setCellWidth(prev => parseInt(prev) - 5)}>-</button>
@@ -523,7 +537,7 @@ const Player = () => {
           <div className="cntrlElement">
             <label> Speed in ms</label>
             <div>
-              <input type="text" onKeyDown={e => handleIntInputOnEnter(e, setSpeed)} />
+              <input type="text" onKeyDown={e => handleIntInputOnEnter(e, setSpeed)}  placeholder="Press enter after typing"/>
               <div className='btnsContainer'>
                 <button onClick={() => {}}>-</button>
                 <button onClick={() => {}}>+</button>
@@ -552,8 +566,6 @@ const Player = () => {
             ref={screenRef} 
             style={screenStyle} 
             id='playerScreen'
-            // onMouseDown={e => handleMouseDown(e)}
-            // onMouseUp={e => handleMouseUp(e)}
           >
               {
                 gridItems?.flat()

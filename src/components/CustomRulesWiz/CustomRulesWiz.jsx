@@ -201,7 +201,7 @@ const CustomRulesWiz = () => {
 
                                     {   
                                         Object.entries(ruleSet[i]).map(([key, value]) => 
-                                            <p>{key} : {value}</p>
+                                            <p className='blockText'>{key} : {value}</p>
                                         )
                                         
                                     }

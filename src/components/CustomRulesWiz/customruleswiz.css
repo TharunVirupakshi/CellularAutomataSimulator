@@ -62,6 +62,14 @@
     gap: 5px;
 }
 
+.blockText{
+    padding: 2px 5px;
+    border-radius: 5px;
+    background-color: #5f5f5f;
+    font-weight: bold;
+    width: fit-content;
+}
+
 .counter{
     display: flex;
     flex-direction: column;

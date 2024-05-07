@@ -102,6 +102,7 @@ const Player = () => {
   }
 
 
+
   const [grid, setGrid] = useState(()=>initializeGrid(gridSize));
   // const [grid, setGrid] = useState(()=>initializeGridState(glider)); //enable for glider
   
@@ -114,16 +115,14 @@ const Player = () => {
     })
   }, [gridSize,cellWidth])
   
-  useEffect(() => {
-    // console.log('State', grid)
-  }, [grid])
-
   // useEffect(() => {
-  //   setGrid(initializeGrid(gridSize))
-  // },[gridSize])
+  //   console.log('State', grid)
+  // }, [grid])
+
+
 
   const handleGridSizeChange = (newSize) => {
-    // const offset = newSize > gridSize ? (newSize - gridSize - 1) : newSize < gridSize ? -(gridSize - newSize - 1): gridSize;
+    
     const newOddSize = newSize % 2 === 1 ? newSize : (parseInt(newSize) + 1)
     const offset = Math.floor((newOddSize - gridSize) / 2);
 
@@ -179,26 +178,6 @@ const Player = () => {
     return states[index]
   }
 
-  //When you use the functional form of setGrid, 
-  //React may batch multiple state updates together, and this can 
-  //result in unexpected behavior when you toggle the cell state. 
-  //If the updates are batched, the newGrid inside the function may not reflect the latest state of the grid.
-  // const toggleCell = (row, col, e) => {
-  //   console.log('ToggleCell Triggered:', row, col);
-    
-  //   setGrid((prevGrid) => {
-  //     const newGrid = [...prevGrid];
-  //     console.log('State before ',newGrid);
-  //     if(newGrid[row][col]){
-  //       newGrid[row][col] = false;
-  //     }else{
-  //       newGrid[row][col] = true; 
-  //     }
-  //     // newGrid[row][col] = !newGrid[row][col];
-  //     console.log('State updated ',newGrid);
-  //     return newGrid;
-  //   });
-  // };
 
   const toggleCell = (row, col, e) => {
     // console.log('ToggleCell Triggered:', row, col);
@@ -214,9 +193,12 @@ const Player = () => {
     
   };
 
+
+
+
   const handleMouseOver = useCallback(
     (row, col, e) => {
-      if (isDrawing){
+      if ((e.ctrlKey || e.metaKey) && e.altKey){
         const newGrid = [...grid];
         newGrid[row][col] = toggleState(newGrid[row][col], states);
         setGrid(newGrid);
@@ -225,6 +207,9 @@ const Player = () => {
     [grid, isDrawing]
   );
   
+
+
+
 
   const gridItems = grid?.map((row, rowIndex) =>
   row.map((cell, colIndex) => (
@@ -240,6 +225,9 @@ const Player = () => {
 
   )))
 
+  
+  
+  
   //Calculate Neighbors LOGIC
 
   const countNgbhrs = (grid,gridSize,nbors, r0, c0, n) => {
@@ -278,6 +266,9 @@ const Player = () => {
   ]
 
  
+
+
+
 
   //Compute Next Boards LOGIC
   const computeNextGen = (states, callBck, rules, ngbrhood_size, gridSize) => {
@@ -382,13 +373,9 @@ const Player = () => {
   };
 
 
-  const handleMouseDown = (e) => {
-    setIsDrawing(true);
-  };
 
-  const handleMouseUp = () => {
-    setIsDrawing(false);
-  };
+
+
 
   const handleReset = () => {
     setGrid(initializeGrid(gridSize))
@@ -398,30 +385,23 @@ const Player = () => {
   const playButtonRef = useRef(null);
 
 
+  const handleKeyDown =useCallback((e) => {
+    console.log("Key pressed:", e.metaKey)
+    console.log("Key pressed:", e.altKey)
+    if((e.metaKey || e.ctrlKey) && e.altKey) 
+    setIsDrawing(true)
+    setDisableDrag(true); // Disable dragging when CMD/Ctrl key is pressed
+  });
 
-  // Controlling Key Commands
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-        if((e.metaKey || e.ctrlKey) && e.altKey) setIsDrawing(true)
-        setDisableDrag(true); // Disable dragging when CMD/Ctrl key is pressed
-    };
+  const handleKeyUp = useCallback((e) => {
     
-    const handleKeyUp = (e) => {
-      if (screenRef.current && screenRef.current.contains(e.target)) {
-      if (!e.metaKey && !e.ctrlKey) {
-        setIsDrawing(false)
-        setDisableDrag(false); // Re-enable dragging when CMD/Ctrl key is released
-      }}
-    };
+    if (!e.metaKey && !e.ctrlKey) {
+      setIsDrawing(false)
+      setDisableDrag(false); // Re-enable dragging when CMD/Ctrl key is released
+    } 
+  });
 
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('keyup', handleKeyUp);
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('keyup', handleKeyUp);
-    };
-  }, []); 
+ 
 
   const calculateMiddlePosition = () => {
     // Get the width and height of the screen
@@ -566,6 +546,9 @@ const Player = () => {
             ref={screenRef} 
             style={screenStyle} 
             id='playerScreen'
+            onKeyDown={e => handleKeyDown(e)}
+            onKeyUp={e => handleKeyUp(e)}
+            
           >
               {
                 gridItems?.flat()

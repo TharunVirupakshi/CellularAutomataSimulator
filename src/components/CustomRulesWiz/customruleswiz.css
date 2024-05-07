@@ -116,6 +116,18 @@
     background-color: #d65d42;
     color: #ddd;
 }
+.applyBtnContainer{
+    display: flex;
+    align-items: center;
+    /* background-color: antiquewhite; */
+    padding: 1em;
+    justify-content: center;
+}
+
+.applyBtn{
+    color: lightgreen;
+    padding: .5em 1em;
+}
 
 .counter{
     display: flex;

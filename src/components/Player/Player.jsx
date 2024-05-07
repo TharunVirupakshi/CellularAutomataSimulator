@@ -48,6 +48,35 @@ const Player = () => {
   const TOT_STATES = states.length;
   const NGHBRHOOD_SIZE = 8;
 
+  //Rules
+  const GOL = [
+    {
+      "53": 1,  //GOL
+      "default": 0
+    },
+    {
+      "62": 1,
+      "53": 1, //GOL
+      "default": 0
+    },
+  ]
+  
+  const [ruleSet, setRuleSet] = useState(GOL)
+
+  const applyNewRuleSet = (rules) => {
+    if (rules && Object.keys(rules).length > 0) {
+      
+      setRuleSet(rules); 
+      alert('New Rules applied!')
+      console.log('New rule set applied:', rules);
+      setRuleModal(false)
+    } else {
+      alert('Invalid Rules')
+      console.log('No valid rules provided.', rules); 
+    }
+  };
+
+
   const screenRef = useRef(null)
 
   const [screenStyle, setScreenStyle] = useState({})
@@ -253,17 +282,6 @@ const Player = () => {
     }
   }
 
-  const GOL = [
-    {
-      "53": 1,  //GOL
-      "default": 0
-    },
-    {
-      "62": 1,
-      "53": 1, //GOL
-      "default": 0
-    },
-  ]
 
  
 
@@ -341,7 +359,7 @@ const Player = () => {
           grid,
           gridSize,
           ngbrhood_size : NGHBRHOOD_SIZE,
-          rules : GOL,
+          rules : ruleSet ?? GOL,
           delay: speed
         }
       }
@@ -469,7 +487,7 @@ const Player = () => {
                         <button className="close-button" onClick={() => setRuleModal(false)}>
                           <span aria-hidden="true">&times;</span>
                         </button>
-                        <CustomRulesWiz/>
+                        <CustomRulesWiz saveNewRuleSet={applyNewRuleSet}/>
                       </div>
                     </Modal>
 

@@ -3,7 +3,7 @@ import './customruleswiz.css'
 import NghbrSizeImg from '../../assets/Artboard 3@3x.png'
 import { useEffect } from 'react';
 
-const CustomRulesWiz = () => {
+const CustomRulesWiz = ({saveNewRuleSet}) => {
 
     const [step, setStep] = useState(0);
     const [stateCount, setStateCount] = useState(2);
@@ -278,10 +278,25 @@ const CustomRulesWiz = () => {
               </>
               )
           }
+          {
+            step == 3 && (
+                <>
+                <h2>Confirm changes?</h2>
+                  <p>
+                    You're about to save your changes. Click "Apply" to apply the changes, or go back to review and make any necessary adjustments.
+                  </p>
+                  <div className="applyBtnContainer">
+                    <button className='applyBtn' onClick={() => saveNewRuleSet(ruleSet)}>Apply</button>
+                  </div>
+                  
+
+                </>
+            )
+          }
 
         <div className="navigationBtns">
-        <button style={{visibility: step == 0 ? 'hidden' : 'visible'}} onClick={prevStep}>&larr; Prev</button>
-        <button onClick={nextStep}>Next &rarr;</button>
+        <button style={{visibility: step <= 0 ? 'hidden' : 'visible'}} onClick={prevStep}>&larr; Prev</button>
+        <button style={{visibility: step >= 3 ? 'hidden' : 'visible'}} onClick={nextStep}>Next &rarr;</button>
         </div>    
     </div>
   )

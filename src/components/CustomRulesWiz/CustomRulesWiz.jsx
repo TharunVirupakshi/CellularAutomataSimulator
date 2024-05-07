@@ -76,6 +76,10 @@ const CustomRulesWiz = () => {
 
     return(
         <div className="ruleDefiner">
+        <div className="headerTitle">
+        <span>State : </span><span>Neighbours : </span>
+        </div>
+
         {  
             Array.from({length : states}).map((_, index) => (
                 <div className="counter" key={index}>
@@ -120,7 +124,20 @@ const CustomRulesWiz = () => {
     console.log('Rule Set:', ruleSet)
   },[ruleSet])
 
+  
+
+  
   const addRule = (state, condString, res) => {
+
+    if(res < 0){
+        alert('No negative states!')
+        return;
+    }
+    if(res > (stateCount - 1)){
+        alert(`Cannot exceed the set limit : ${stateCount - 1}`)
+        return; 
+    }
+      
 
     console.log("State: ", state," condstr: ", condString, " res: ", res )
     setRuleSet(prev => {
@@ -129,6 +146,28 @@ const CustomRulesWiz = () => {
         return updated;
     })
   }
+
+
+
+
+ const [isEdit, setIsEdit] = useState(Array.from({length : stateCount}).fill(false))
+
+ const handleEdit = (i) => {
+    setIsEdit(prev => {
+        const updated = [...prev]
+        updated[i] = !updated[i]
+        return updated
+        }
+    )
+ }
+
+ const handleDel = (i, key) => {
+    setRuleSet(prev => {
+        const updated = [...prev]
+        delete updated[i][key]
+        return updated
+    })
+ }
 
   return (
     <div className='content' style={{width: '100%'}}>
@@ -196,18 +235,40 @@ const CustomRulesWiz = () => {
 
                      {
                         Array.from({ length: stateCount }).map((_, i) => (
-                            <div key={i}>
+                            <div key={i} className="settingsForEach">
                               <h3>For State : {i}</h3>
+
+                                <div className="rulesContainer">
 
                                     {   
                                         Object.entries(ruleSet[i]).map(([key, value]) => 
-                                            <p className='blockText'>{key} : {value}</p>
+                                            {
+                                               return key === 'default' ?
+                                                   
+                                                       <div className='blockText'>{key} : {value} {isEdit[i] &&
+                                                           <div className="counter" key={i}>
+
+                                                               <input
+                                                                   type="number"
+                                                                   onChange={(e) => addRule(i, 'default', parseInt(e.target.value))}
+                                                                   value={value}
+                                                               />
+                                                           </div>}
+                                                           <span className='editBtn' onClick={e => handleEdit(i)}>{isEdit[i] ? "Done" : "Edit"} </span>
+                                                        </div>
+                                                   
+                                                 : 
+                                                    <div className='blockText'>{key} : {value} <span className='editBtn delBtn' onClick={e => handleDel(i, key)}>Del</span></div>
+
+                                            }
+                                           
                                         )
                                         
                                     }
+                                </div>
 
                                   <RenderCounter states={stateCount} state={i} addFunction={addRule}/>
-
+                            
                             </div>
                         ))
                      }

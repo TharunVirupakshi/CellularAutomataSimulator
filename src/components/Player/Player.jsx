@@ -44,7 +44,7 @@ const Player = () => {
   const [gap, setGap] = useState(0);
   const [cellWidth, setCellWidth] = useState(50);
   const [speed, setSpeed] = useState(500);
-  const states = [0,1];
+  const [states, setStates] = useState([0,1]);
   const TOT_STATES = states.length;
   const NGHBRHOOD_SIZE = 8;
 
@@ -62,13 +62,21 @@ const Player = () => {
   ]
   
   const [ruleSet, setRuleSet] = useState(GOL)
+  const [colors, setColors] = useState(['transparent', '#c2c2c2'])
 
-  const applyNewRuleSet = (rules) => {
+
+
+
+  const applyNewRuleSet = (rules, colorSet) => {
     if (rules && Object.keys(rules).length > 0) {
       
-      setRuleSet(rules); 
+      setRuleSet(rules);
+      const newStateArray = Array.from({ length : rules.length }, (_, index) => index);
+      console.log('New States:', newStateArray)
+      setStates(newStateArray);
       alert('New Rules applied!')
       console.log('New rule set applied:', rules);
+      setColors(colorSet)
       setRuleModal(false)
     } else {
       alert('Invalid Rules')
@@ -202,7 +210,7 @@ const Player = () => {
 
   const toggleState = (state, states) => {
     const index = ((states.indexOf(state)) + 1) % states.length;
-    // console.log('ToggleState states: ', states, ' index: ', index);
+    console.log('ToggleState states: ', states, ' index: ', index);
     
     return states[index]
   }
@@ -244,8 +252,8 @@ const Player = () => {
   row.map((cell, colIndex) => (
     <div
       key={`${rowIndex}-${colIndex}`}
-      className={`cell ${cell ? 'alive' : 'dead'}`}
-      style={{ width: `${cellWidth}px` }}
+      className={`cell`}
+      style={{ width: `${cellWidth}px` , backgroundColor : colors[cell]}}
       onClick={(e) => toggleCell(rowIndex, colIndex, e)}
       onMouseOver={(e) => handleMouseOver(rowIndex, colIndex, e)}
     >

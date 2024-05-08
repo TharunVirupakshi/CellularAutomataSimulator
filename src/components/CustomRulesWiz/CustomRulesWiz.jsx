@@ -24,6 +24,26 @@ const CustomRulesWiz = ({saveNewRuleSet}) => {
             return;
         }
         setStateCount(value)
+        if (colors.length < value) {
+            const diff = value - colors.length;
+            const newColors = [...colors]; // Create a copy of the existing colors array
+        
+            // Add 'transparent' for the additional states
+            for (let i = 0; i < diff; i++) {
+              newColors.push('transparent');
+            }
+        
+            // Update the colors state with the new array
+            setColors(newColors);
+          } else if (colors.length > value) {
+            // If the new stateCount is less than the current colors array length, trim the array
+            const newColors = colors.slice(0, value);
+            setColors(newColors);
+          }
+
+        
+        
+
     }
 
 
@@ -120,11 +140,6 @@ const CustomRulesWiz = ({saveNewRuleSet}) => {
     },
   ])
 
-  useEffect(()=>{
-    console.log('Rule Set:', ruleSet)
-  },[ruleSet])
-
-  
 
   
   const addRule = (state, condString, res) => {
@@ -142,13 +157,33 @@ const CustomRulesWiz = ({saveNewRuleSet}) => {
     console.log("State: ", state," condstr: ", condString, " res: ", res )
     setRuleSet(prev => {
         const updated = [...prev]
-        updated[state][condString] = res;
+        updated[state] = {
+            ...updated[state],
+            [condString] : res
+        }
+        // console.log('Updated : ', updated)
         return updated;
     })
   }
 
+  const [colors, setColors] = useState(['transparent', '#c2c2c2'])
 
+  const handleColorChange = (state, colorCode) => {
+    setColors(prev => {
+        const updated = [...prev]
+        updated[state] = colorCode
+        return updated
+    })
+  }
+  useEffect(()=>{
+    const newRules = Array.from({length:stateCount}).fill({"default" : 0})
+    setRuleSet(newRules)
+  },[stateCount])
 
+  useEffect(()=>{
+    console.log('Rule Set:', ruleSet)
+    console.log('Color Set:', colors)
+  },[ruleSet, colors])
 
  const [isEdit, setIsEdit] = useState(Array.from({length : stateCount}).fill(false))
 
@@ -192,11 +227,29 @@ const CustomRulesWiz = ({saveNewRuleSet}) => {
                   <input 
                     placeholder='Enter number of states' 
                     type='number'
-                    onChange={e => handleStateCountChange(e.target.value)}
-                    defaultValue={2}
-                    
-                  />
-                 </div>
+                          onChange={e => handleStateCountChange(e.target.value)}
+                          value={stateCount}
+
+                      />
+                  </div>
+                
+                          <h3>State Colors</h3>
+                          <p>Select colors for each state:</p>
+                          <div className="colorSelection">
+                              {Array.from({length : stateCount}).map((_, index) => (
+                                  <div key={index} className="colorOption">
+                                      <label htmlFor={`stateColor${index}`}>State {index} Color:</label>
+                                      <input
+                                          style={{cursor : 'pointer'}}
+                                          type="color"
+                                          id={`stateColor${index}`}
+                                          onChange={e => handleColorChange(index, e.target.value)}
+                                          value={colors[index] === 'transparent' ? "#000000" : colors[index]}
+                                      />
+                                  </div>
+                              ))}
+                          </div>
+                  
               </>
               )
           }
@@ -286,7 +339,7 @@ const CustomRulesWiz = ({saveNewRuleSet}) => {
                     You're about to save your changes. Click "Apply" to apply the changes, or go back to review and make any necessary adjustments.
                   </p>
                   <div className="applyBtnContainer">
-                    <button className='applyBtn' onClick={() => saveNewRuleSet(ruleSet)}>Apply</button>
+                    <button className='applyBtn' onClick={() => saveNewRuleSet(ruleSet, colors)}>Apply</button>
                   </div>
                   
 

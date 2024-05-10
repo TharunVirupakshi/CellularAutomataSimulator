@@ -2,6 +2,9 @@
 
 This project implements a cellular automaton simulation using React, allowing users to observe fascinating patterns emerge and evolve within a grid-based environment.
 
+![Img](images/fish.gif)
+![Img](images/fish.gif)
+
 ## Key Features
 
 - **Visualization**: Watch captivating patterns unfold as the simulation progresses.

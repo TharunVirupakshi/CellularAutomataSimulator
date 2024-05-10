@@ -98,7 +98,10 @@ button, option, select {
     justify-content: center;
     flex-direction: column;
 }
-
+.cntrlElement input{
+    width: 100%;
+    box-sizing: border-box;
+}
 .cntrlElement label{
     font-weight: bold;
 }

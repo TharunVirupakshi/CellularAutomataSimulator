@@ -49,22 +49,65 @@ const Player = () => {
   const NGHBRHOOD_SIZE = 8;
 
   //Rules
-  const GOL = [
+  const GOL = {
+    rules : [
     {
-      "53": 1,  //GOL
+      "53": 1,  
       "default": 0
     },
     {
       "62": 1,
-      "53": 1, //GOL
+      "53": 1,
       "default": 0
     },
-  ]
+    ],
+    stateColors : ['transparent', '#c2c2c2']
+  }
   
-  const [ruleSet, setRuleSet] = useState(GOL)
-  const [colors, setColors] = useState(['transparent', '#c2c2c2'])
+  const SEEDS = {
+    rules : [
+      {
+        "62": 1, // If a cell is off and has exactly 2 neighbors that are on, it becomes on
+        "default": 0 // Default rule: if none of the specific rules apply, stay off
+      },
+      {
+        "default": 0 
+      }
+    ],
+    stateColors : ['transparent', '#c2c2c2'] 
+  }
 
+  const BRAINS_BRAIN = {
+    rules : [
+      {
+        // Rules for state 0 (Off)
+        "026": 1, // If a cell is off and has exactly 2 neighbors that are on, it becomes on
+        "125": 1,
+        "224": 1,
+        "323": 1,
+        "422": 1,
+        "521": 1,
+        "620": 1,
+        "default": 0 // Default rule: if none of the specific rules apply, stay off
+      },
+      {
+        // Rules for state 1 (On)
+        "default": 2 // Any cell that is on will transition to dying in the next step
+      },
+      {
+        // Rules for state 2 (Dying)
+        "default": 0 // Any cell that is dying will transition to off in the next step
+      }
+    ],
+    stateColors : ['transparent', '#c2c2c2', '#ff5757'] 
+  }
 
+ 
+  
+  const [ruleSet, setRuleSet] = useState(GOL.rules)
+  const [colors, setColors] = useState(GOL.stateColors)
+
+  const [preset, setPreset] = useState('GameOfLife')
 
 
   const applyNewRuleSet = (rules, colorSet) => {
@@ -84,6 +127,34 @@ const Player = () => {
     }
   };
 
+  const handlePresetChange = (preset) => {
+    switch(preset){
+      case 'GOL' : setRuleSet(GOL.rules)
+                   setColors(GOL.stateColors)
+                   setStates([0,1])
+                   setPreset('GameOfLife')
+                   alert('Game of Life rule set applied!')
+                   break;
+      case 'SEEDS' : setRuleSet(SEEDS.rules)
+                            setColors(SEEDS.stateColors)
+                            setStates([0,1])
+                            setPreset('Seeds')
+                            alert('Seeds rule set applied!')
+                            break;
+      case 'BRAINS_BRAIN' : setRuleSet(BRAINS_BRAIN.rules)
+                            setColors(BRAINS_BRAIN.stateColors)
+                            setStates([0,1,2])
+                            setPreset('Brain\'sBrain')
+                            alert('Brain\'s Brain rule set applied!')
+                            break;
+      default : break; 
+    }
+  }
+
+  // useEffect(()=>{
+  //   console.log('Preset : ', preset)
+
+  // },[preset])
 
   const screenRef = useRef(null)
 
@@ -186,7 +257,7 @@ const Player = () => {
   // Worker Thread
 
   const handleWorkerMessage = useCallback((ev) => {
-    console.log("[MAIN] Msg from worker: ", ev.data);
+    // console.log("[MAIN] Msg from worker: ", ev.data);
     const { action, res } = ev.data;
   
     if (action === "COMPUTE" || action === "PLAYING") {
@@ -210,7 +281,7 @@ const Player = () => {
 
   const toggleState = (state, states) => {
     const index = ((states.indexOf(state)) + 1) % states.length;
-    console.log('ToggleState states: ', states, ' index: ', index);
+    // console.log('ToggleState states: ', states, ' index: ', index);
     
     return states[index]
   }
@@ -399,7 +470,9 @@ const Player = () => {
   };
 
 
-
+  const handleSpeedChange = (value) => {
+    
+  }
 
 
 
@@ -475,9 +548,10 @@ const Player = () => {
               <div className="cntrlElement">
                 <label >Rules</label>
                 <div>
-                  <select id="ruleset" name="ruleset">
-                    <option value="GOL" defaultChecked>GameOfLife</option>
-                    <option value="2">2</option>  
+                  <select id="ruleset" name="ruleset" onChange={e => handlePresetChange(e.target.value)}>
+                    <option value="GOL">GameOfLife</option>
+                    <option value="SEEDS">Seeds</option>  
+                    <option value="BRAINS_BRAIN">Brain's Brain</option>  
                   </select>
 
             
@@ -541,12 +615,12 @@ const Player = () => {
           <div className="cntrlEleWrapper">
 
           <div className="cntrlElement">
-            <label> Speed in ms</label>
+            <label> Current Speed: {speed}ms</label>
             <div>
               <input type="text" onKeyDown={e => handleIntInputOnEnter(e, setSpeed)}  placeholder="Press enter after typing"/>
               <div className='btnsContainer'>
-                <button onClick={() => {}}>-</button>
-                <button onClick={() => {}}>+</button>
+                <button onClick={() => setSpeed(prev => Math.max(prev - 100, 0))}>-</button>
+                <button onClick={() => setSpeed(prev => prev + 100)}>+</button>
               </div>
             </div>
           </div> 
@@ -560,6 +634,7 @@ const Player = () => {
     
           </div>
           </div>
+
         </div>
        
           

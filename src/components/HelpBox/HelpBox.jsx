@@ -18,14 +18,16 @@ const HelpBox = () => {
             <li><strong>Resize the Grid:</strong> Increase the grid size in the control panel to fit your needs. More cells mean more space for exciting patterns!</li>
         </ul>
 
-        <h2>2. Cell Size Control</h2>
+        <h2>2. Cell Control</h2>
         <ul>
-            <li><strong>Adjust Cell Size:</strong> Use the cell width slider to make cells bigger or smaller. Find the perfect size for clear visibility and detail.</li>
+        <li><strong>Toggle Cell State:</strong> Use <span class="underline">Ctrl + click</span> to toggle cell states.</li>
+        <li><strong>Brush Mode (Bulk Editing):</strong> Use <span class="underline">Ctrl + Alt</span> to brush over the cells.</li>
+        <li><strong>Adjust Cell Size:</strong> Adjust the cell width to make cells bigger or smaller. Find the perfect size for clear visibility and detail.</li>
         </ul>
 
         <h2>3. Simulation Settings</h2>
         <ul>
-            <li><strong>Set Simulation Speed:</strong> Control the speed of the simulation with the speed slider. Watch patterns evolve at your preferred pace.</li>
+            <li><strong>Set Simulation Speed:</strong> Control the simulation speed by specifying the time interval in milliseconds. Observe the evolution of patterns at your desired pace.</li>
         </ul>
 
         <h2>4. Simulation Controls</h2>

@@ -42,7 +42,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgements
 
-Special thanks to [The Coding Train](https://www.youtube.com/c/TheCodingTrain) for the helpful tutorial on cellular automaton simulations ([Watch Video](https://www.youtube.com/watch?v=ygdPRlSo3Qg)). Portions of the code and concepts in this project were inspired by their work.
+Special thanks to [TsodingDaily] (https://youtube.com/@TsodingDaily?si=1i3T-4pv9radMhSg) for the helpful tutorial on cellular automaton simulations ([Watch Video](https://www.youtube.com/watch?v=ygdPRlSo3Qg)). Portions of the code and concepts in this project were inspired by their work.
 
 This project was inspired by the fascinating concepts of cellular automata and is developed for educational and experimental purposes.
 

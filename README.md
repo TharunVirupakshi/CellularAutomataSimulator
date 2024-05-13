@@ -2,7 +2,7 @@
 
 This project implements a cellular automaton simulation using React, allowing users to observe fascinating patterns emerge and evolve within a grid-based environment.
 
-Live Demo : https://tharunvirupakshi.github.io/CellularAutomataSimulator/
+Live Demo (Currently supports only desktop view): https://tharunvirupakshi.github.io/CellularAutomataSimulator/
 
 ![Img](images/fish.gif)
 ![BrainsBrain](images/BrainsBrain.png)

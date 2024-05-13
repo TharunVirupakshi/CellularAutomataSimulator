@@ -260,7 +260,7 @@ const Player = () => {
     // console.log("[MAIN] Msg from worker: ", ev.data);
     const { action, res } = ev.data;
   
-    if (action === "COMPUTE" || action === "PLAYING") {
+    if (action === "COMPUTED" || action === "PLAYING") {
       setGrid((prevGrid) => res);
     }
   }, [setGrid]);
@@ -408,10 +408,11 @@ const Player = () => {
         grid,
         gridSize,
         ngbrhood_size : NGHBRHOOD_SIZE,
-        rules : GOL
+        rules :  ruleSet ?? GOL
       }
     }
-    worker.postMessage(msg)
+    if(worker)
+      worker.postMessage(msg)
   };
 
   
@@ -519,9 +520,25 @@ const Player = () => {
 
   const [ruleModal, setRuleModal] = useState(false)
 
+  const [isOpen, setIsOpen] = useState(true) 
+  const [offset, setOffset] = useState(0)
+  const controlPanelRef = useRef(null);
 
+  useEffect(()=>{
+    
+    const height = controlPanelRef.current?.getBoundingClientRect().height 
+    console.log('Control panel height:', height)
+    setOffset(height)
+  }, [controlPanelRef])
 
+  const simBtnsStyles = {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      top: '-70px'
+  }
 
+  
 
   return (
   <>
@@ -529,8 +546,8 @@ const Player = () => {
     <div className='playerBox'>
         {/* <h2>Cellular Automata</h2> */}
         
-        <div className="controlPanel">
-
+        <div className="controlPanel" ref={controlPanelRef} style={{bottom : isOpen ? 0 : `-${offset}px`}}>
+          <div className="minimizeBtn" style={{bottom : `${offset}px`}} onClick={() => setIsOpen(prev => !prev)}>{isOpen ? 'Close' : 'Open'}</div>
           <div className="basicControlsBox ">
 
             <div className="cntrlEleWrapper">
@@ -626,7 +643,7 @@ const Player = () => {
           </div> 
           </div>
           <div className="cntrlEleWrapper">
-          <div className="cntrlElement simBtns ">
+          <div className="cntrlElement simBtns" style={isOpen ? {} : simBtnsStyles}>
 
             <button onClick={handleComputeNextGen} id='next-gen' >NEXT GEN</button>
             <button ref={playButtonRef} onClick={handlePlayButtonClick} id='play' >{isPlaying ? 'STOP' : 'PLAY'}</button>

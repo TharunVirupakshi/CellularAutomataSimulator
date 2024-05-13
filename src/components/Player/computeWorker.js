@@ -30,7 +30,7 @@ const workercode = () => {
         // const ALIVE = 1;
         const nbors = new Array(states).fill(0);
 
-        // console.log('Computing next gen [worker thread]......');
+        console.log('Computing next gen [worker thread]......');
         // console.log('nbors[]: ', nbors);
 
         const nextGrid = grid.map((rowArray, row) =>
@@ -60,9 +60,6 @@ const workercode = () => {
     var gridCopy;
     const startInterval = (payload) => {
         const {states, gridSize, ngbrhood_size, rules, delay} = payload;
-
-        
-
         intervalId = setInterval(() => {
             const result = computeNextGen(states, gridCopy, gridSize, ngbrhood_size, rules)
             gridCopy = result
@@ -95,7 +92,6 @@ const workercode = () => {
                 startInterval(payload);
                 break;
             case "STOP":
-               
                 stopInterval();
                 break;
             default:

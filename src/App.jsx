@@ -39,7 +39,7 @@ function App() {
   return (
     <>
       <Navbar aboutFunction={openAboutModal} helpFunction={openHelpModal}/> 
-      <Player/>
+      <Player openHelpBox={openHelpModal}/>
       <Modal
         isOpen={aboutModal}
         onRequestClose={closeAboutModal}

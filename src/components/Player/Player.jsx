@@ -6,6 +6,10 @@ import RLE from './rle';
 import Draggable from 'react-draggable';
 import Modal from 'react-modal'
 import CustomRulesWiz from '../CustomRulesWiz/CustomRulesWiz';
+import SmallHelpBox from '../SmallHelpBox/SmallHelpBox';
+
+
+
 // Cell component
 const Cell = ({content, width, classes, onClickFunction}) => {
 
@@ -35,7 +39,7 @@ const Cell = ({content, width, classes, onClickFunction}) => {
 
 
 
-const Player = () => {
+const Player = ({openHelpBox}) => {
 
   
 
@@ -277,7 +281,36 @@ const Player = () => {
     }
   },[handleWorkerMessage])
 
+  // To toggle the cursor 
+  useEffect(() => {
 
+    const handleKeyDown = (e) => {
+      // Check if the Ctrl key or Command key (for Mac) is pressed and screenRef is in focus
+      if ((e.ctrlKey || e.metaKey)) {
+        // console.log('Drawing Mode ON')
+        setIsDrawing(true);
+      }
+    };
+
+    const handleKeyUp = (e) => {
+        if(!e.ctrlKey && !e.metaKey){
+          setIsDrawing(false);
+          // console.log('Drawing Mode OFF') 
+        }
+        
+      
+    };
+
+    // Add event listeners when the component mounts
+    document.addEventListener('keydown', handleKeyDown, {capture : true});
+    document.addEventListener('keyup', handleKeyUp, {capture : true});
+
+    // Clean up the event listeners when the component unmounts
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []); 
 
   const toggleState = (state, states) => {
     const index = ((states.indexOf(state)) + 1) % states.length;
@@ -312,7 +345,7 @@ const Player = () => {
         setGrid(newGrid);
       }
     },
-    [grid, isDrawing]
+    [grid]
   );
   
 
@@ -538,6 +571,32 @@ const Player = () => {
       top: '-70px'
   }
 
+  const [showHelp, setShowHelp] = useState(false)
+
+  useEffect(()=>{
+
+    
+    const timer = setTimeout(() => {
+      const hasVisitedBefore = localStorage.getItem('visited');
+      if (!hasVisitedBefore) {
+        // localStorage.setItem('visited', 'true');
+        setShowHelp(true);
+      }
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  },[])
+
+  
+  const dntShwAgain = () => {
+    localStorage.setItem('visited', 'true') 
+    setShowHelp(false)
+  }
+
+  const redirectToHelpBox = () =>{
+    setShowHelp(false)
+    openHelpBox()
+  }
   
 
   return (
@@ -545,7 +604,19 @@ const Player = () => {
   
     <div className='playerBox'>
         {/* <h2>Cellular Automata</h2> */}
-        
+        <Modal
+          isOpen={showHelp}
+          onRequestClose={() => setShowHelp(false)}
+          className="modal"
+          overlayClassName="modal-overlay"
+        >
+          <div className="modal-content">
+            <button className="close-button" onClick={() => setShowHelp(false)}>
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <SmallHelpBox seeMoreFunc={redirectToHelpBox} dontShowAgainFunc={dntShwAgain}/> 
+          </div>
+        </Modal>
         <div className="controlPanel" ref={controlPanelRef} style={{bottom : isOpen ? 0 : `-${offset}px`}}>
           <div className="minimizeBtn" style={{bottom : `${offset}px`}} onClick={() => setIsOpen(prev => !prev)}>{isOpen ? 'Close' : 'Open'}</div>
           <div className="basicControlsBox ">
@@ -657,12 +728,12 @@ const Player = () => {
           
         
         </div>
-        <div className="player-screen-wrapper" >
-        <Draggable disabled={disableDrag} defaultPosition={middlePosition}   >
+        <div className="player-screen-wrapper">
+        <Draggable disabled={disableDrag} defaultPosition={middlePosition}  >
           <div 
             className="player-screen" 
             ref={screenRef} 
-            style={screenStyle} 
+            style={{...screenStyle, cursor : isDrawing ? "pointer" : "move"}} 
             id='playerScreen'
             onKeyDown={e => handleKeyDown(e)}
             onKeyUp={e => handleKeyUp(e)}

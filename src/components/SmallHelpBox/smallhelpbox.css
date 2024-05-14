@@ -1,0 +1,17 @@
+.smHelpBoxBody{
+    text-align: center;
+}
+
+.smHelpBoxBody button{
+    padding: .5em;
+    margin: .5em;
+}
+
+.container{
+    display: flex;
+}
+
+.sub-container .imgContainer{
+    margin: 0 8em;
+}
+

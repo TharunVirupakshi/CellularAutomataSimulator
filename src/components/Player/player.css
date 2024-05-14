@@ -34,7 +34,7 @@
     aspect-ratio: 1;
     /* width: 30px; */
     border: solid rgb(101, 101, 101) .1px;
-    cursor: pointer;
+    /* cursor: pointer; */
     font-size: x-small;
 }
 
